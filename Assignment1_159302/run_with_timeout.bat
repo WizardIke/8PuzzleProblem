@@ -1,0 +1,19 @@
+@echo OFF
+SET MAXWAIT=150
+SET WAITCOUNT=0
+start /b "" %*
+
+:WAIT
+IF %WAITCOUNT% GEQ %MAXWAIT% GOTO KILL_IT
+
+TIMEOUT /T 1 /NOBREAK > NUL
+set /A WAITCOUNT=WAITCOUNT+1
+FOR /F "delims=" %%a IN ('TASKLIST ^| FIND /C "%~nx1"') DO IF %%a EQU 0 GOTO RUN_DONE
+GOTO WAIT
+
+:KILL_IT
+TASKKILL /IM %~nx1 /F > NUL
+@echo %3 exceeded %MAXWAIT% second time out.
+FOR /F "delims=" %%a IN ('TASKLIST ^| FIND /C "%~nx1"') DO IF %%a EQU 0 GOTO RUN_DONE
+goto WAIT
+:RUN_DONE
